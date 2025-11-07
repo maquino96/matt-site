@@ -161,8 +161,29 @@ export async function getPostBySlugFromSupabase(slug: string): Promise<Post | nu
 }
 
 export async function getLatestPostsFromSupabase(count: number = 5): Promise<Post[]> {
-  const allPosts = await getAllPostsFromSupabase()
-  return allPosts.slice(0, count)
+  // Query directly with limit for better performance and freshness
+  // Sort by created_at for most recently created posts (when they were added to the database)
+  let query = supabaseServer
+    .from('posts')
+    .select('*')
+    .eq('published', true)
+    .order('created_at', { ascending: false })
+    .limit(count)
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('[Posts] Supabase error fetching latest posts:', error)
+    throw new Error(`Failed to fetch latest posts from Supabase: ${error.message}`)
+  }
+
+  if (!data) {
+    console.warn('[Posts] No data returned from Supabase for latest posts')
+    return []
+  }
+
+  console.log(`[Posts] Fetched ${data.length} latest posts from Supabase`)
+  return data.map(convertSupabasePost)
 }
 
 // Unified functions that use the configured data source
