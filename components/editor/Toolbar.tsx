@@ -88,7 +88,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
         className={buttonClass(editor.isActive('blockquote'))}
         title="Blockquote"
       >
-        "
+        {`"`}
       </button>
 
       <div className="w-px h-6 bg-primary-700 mx-1" />

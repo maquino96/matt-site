@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import dynamic from 'next/dynamic'
 import MiniAppFrame from '@/components/MiniAppFrame'
 
 export const metadata: Metadata = {
@@ -11,27 +10,16 @@ export const metadata: Metadata = {
   },
 }
 
-// Example mini apps - lazy loaded
-const TodoApp = dynamic(() => import('@/app/apps/todo/TodoApp'), {
-  loading: () => <div className="text-gray-400">Loading Todo App...</div>,
-})
-
-const DrawingPad = dynamic(() => import('@/app/apps/drawing-pad/DrawingPad'), {
-  loading: () => <div className="text-gray-400">Loading Drawing Pad...</div>,
-})
-
 const miniApps = [
   {
     id: 'todo',
     title: 'Todo List',
     description: 'A simple todo list application to manage your tasks.',
-    component: TodoApp,
   },
   {
     id: 'drawing-pad',
     title: 'Drawing Pad',
     description: 'A simple drawing pad for sketching and doodling.',
-    component: DrawingPad,
   },
 ]
 
@@ -54,7 +42,7 @@ export default function AppsPage() {
               </h2>
               <p className="text-gray-400">{app.description}</p>
             </div>
-            <MiniAppFrame component={app.component} />
+            <MiniAppFrame appId={app.id} />
           </section>
         ))}
       </div>

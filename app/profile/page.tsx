@@ -21,8 +21,8 @@ export default function ProfilePage() {
         <section>
           <h2 className="text-2xl font-semibold text-gray-200 mb-4">About</h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            Welcome to my personal site! I'm a developer passionate about building
-            web applications and sharing knowledge through writing.
+            {`Welcome to my personal site! I'm a developer passionate about building
+            web applications and sharing knowledge through writing.`}
           </p>
           <p className="text-gray-300 leading-relaxed">
             This site serves as both a portfolio and a blog where I document my

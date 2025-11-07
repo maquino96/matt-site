@@ -530,6 +530,199 @@ Response: Post (with id, created_at, etc.)
 
 ---
 
+## Deployment
+
+### GitHub Repository Setup
+
+**Repository**: `matt-site`
+
+#### Initial Setup
+
+1. **Create GitHub Repository**:
+   - Go to https://github.com/new
+   - Repository name: `matt-site`
+   - Visibility: Public (or Private)
+   - Do NOT initialize with README, .gitignore, or license (already exists)
+   - Click "Create repository"
+
+2. **Add Remote and Push**:
+   ```bash
+   # Update remote URL with your GitHub username
+   git remote set-url origin https://github.com/YOUR_USERNAME/matt-site.git
+   
+   # Or use SSH
+   git remote set-url origin git@github.com:YOUR_USERNAME/matt-site.git
+   
+   # Push to GitHub
+   git push -u origin master
+   # Or if your default branch is main:
+   git push -u origin main
+   ```
+
+3. **Alternative: Use Helper Script**:
+   ```bash
+   # Requires GitHub username and personal access token
+   ./scripts/create-github-repo.sh YOUR_USERNAME [TOKEN]
+   ```
+   The script will create the repository via GitHub API and push the code automatically.
+
+#### Branch Protection (Optional)
+
+- Enable branch protection on `main`/`master` branch
+- Require pull request reviews before merging
+- Require status checks to pass
+
+### Vercel Deployment
+
+#### Prerequisites
+
+- GitHub repository created and pushed
+- Vercel account (sign up at https://vercel.com)
+
+#### Deployment Steps
+
+1. **Connect Repository to Vercel**:
+   - Go to https://vercel.com/new
+   - Import your `matt-site` repository
+   - Vercel will auto-detect Next.js framework
+
+2. **Configure Project Settings**:
+   - **Framework Preset**: Next.js (auto-detected)
+   - **Root Directory**: `./` (default)
+   - **Build Command**: `npm run build` (default)
+   - **Output Directory**: `.next` (default, auto-detected)
+   - **Install Command**: `npm install` (default)
+
+3. **Set Environment Variables**:
+   
+   Go to Project Settings → Environment Variables and add:
+   
+   **Required**:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   NEXT_PUBLIC_DATA_SOURCE=supabase
+   ```
+   
+   **Recommended for Production**:
+   ```
+   NEXT_PUBLIC_ENABLE_EDITOR=false
+   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+   ```
+   
+   **Note**: 
+   - Set variables for "Production", "Preview", and "Development" environments
+   - `SUPABASE_SERVICE_ROLE_KEY` should be marked as "Sensitive" (encrypted)
+   - `NEXT_PUBLIC_SITE_URL` should match your Vercel deployment URL
+
+4. **Deploy**:
+   - Click "Deploy"
+   - Vercel will build and deploy your application
+   - First deployment may take 2-3 minutes
+
+5. **Custom Domain (Optional)**:
+   - Go to Project Settings → Domains
+   - Add your custom domain
+   - Follow DNS configuration instructions
+
+#### Automatic Deployments
+
+Vercel automatically deploys:
+- **Production**: Pushes to `main`/`master` branch
+- **Preview**: Pull requests and other branches
+- Each deployment gets a unique URL
+
+#### Environment-Specific Configuration
+
+**Production**:
+- `NEXT_PUBLIC_DATA_SOURCE=supabase` (use Supabase, not filesystem)
+- `NEXT_PUBLIC_ENABLE_EDITOR=false` (disable editor for security)
+- `NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app` (for RSS, OG tags)
+
+**Preview/Development**:
+- Can use `NEXT_PUBLIC_ENABLE_EDITOR=true` for testing
+- Can use `NEXT_PUBLIC_DATA_SOURCE=filesystem` for local testing
+
+### Post-Deployment Verification
+
+#### Checklist
+
+- [ ] Site loads at Vercel URL
+- [ ] Blog posts display correctly
+- [ ] Data source is Supabase (check DataSourceIndicator in dev mode)
+- [ ] RSS feed works: `/api/rss` or `/rss.xml`
+- [ ] API routes respond correctly
+- [ ] Editor is disabled in production (if `NEXT_PUBLIC_ENABLE_EDITOR=false`)
+- [ ] Environment variables are set correctly
+- [ ] Custom domain works (if configured)
+- [ ] SSL certificate is active (automatic with Vercel)
+
+#### Testing Production Build Locally
+
+```bash
+# Build production version
+npm run build
+
+# Test production server
+npm run start
+
+# Verify environment variables
+# Check that NEXT_PUBLIC_DATA_SOURCE=supabase works
+```
+
+#### Monitoring
+
+- **Vercel Dashboard**: View deployments, logs, analytics
+- **Function Logs**: Check API route execution in Vercel dashboard
+- **Supabase Dashboard**: Monitor database queries and performance
+
+### Deployment Troubleshooting
+
+#### Build Failures
+
+- Check build logs in Vercel dashboard
+- Verify all environment variables are set
+- Ensure `package.json` has correct dependencies
+- Check for TypeScript errors: `npm run build` locally
+
+#### Runtime Errors
+
+- Check function logs in Vercel dashboard
+- Verify Supabase connection (check env vars)
+- Check RLS policies allow public read access
+- Verify `NEXT_PUBLIC_DATA_SOURCE` matches your setup
+
+#### Environment Variable Issues
+
+- Ensure variables are set for correct environment (Production/Preview)
+- Check variable names match exactly (case-sensitive)
+- Verify `NEXT_PUBLIC_*` variables are accessible in browser
+- Service role key should NOT be `NEXT_PUBLIC_*` (server-side only)
+
+#### Database Connection Issues
+
+- Verify Supabase URL and keys are correct
+- Check Supabase project is active
+- Verify RLS policies allow necessary operations
+- Check network connectivity from Vercel to Supabase
+
+### Continuous Deployment
+
+Vercel automatically:
+- Deploys on every push to `main`/`master`
+- Creates preview deployments for pull requests
+- Runs build checks before deployment
+- Provides deployment URLs for each commit
+
+#### Manual Deployment
+
+If needed, trigger manual deployment:
+- Vercel Dashboard → Deployments → "Redeploy"
+- Or use Vercel CLI: `vercel --prod`
+
+---
+
 ## Common Patterns
 
 ### Conditional Rendering (Dev Mode)

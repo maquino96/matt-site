@@ -22,8 +22,8 @@ export default async function HomePage() {
           Welcome to My Site
         </h1>
         <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-          I'm a developer passionate about building web applications and sharing
-          knowledge. This site serves as both a portfolio and a blog.
+          {`I'm a developer passionate about building web applications and sharing
+          knowledge. This site serves as both a portfolio and a blog.`}
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
