@@ -2,6 +2,7 @@
 
 import { Editor } from '@tiptap/react'
 import { clsx } from 'clsx'
+import ImageUploadButton from './ImageUploadButton'
 
 interface ToolbarProps {
   editor: Editor
@@ -124,6 +125,23 @@ export default function Toolbar({ editor }: ToolbarProps) {
       >
         🔗
       </button>
+
+      {/* Image URL */}
+      <button
+        onClick={() => {
+          const url = window.prompt('Enter image URL:')
+          if (url) {
+            editor.chain().focus().setImage({ src: url }).run()
+          }
+        }}
+        className={buttonClass(editor.isActive('image'))}
+        title="Insert Image from URL"
+      >
+        🖼️
+      </button>
+
+      {/* Image Upload */}
+      <ImageUploadButton editor={editor} buttonClass={buttonClass} />
     </div>
   )
 }

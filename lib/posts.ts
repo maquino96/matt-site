@@ -17,6 +17,7 @@ function getDataSource(): 'supabase' | 'filesystem' {
 }
 
 export interface Post {
+  id?: string // Optional: only available for Supabase posts
   slug: string
   title: string
   date: string
@@ -98,6 +99,7 @@ export function getLatestPosts(count: number = 5): Post[] {
 // Supabase functions
 function convertSupabasePost(post: SupabasePost): Post {
   return {
+    id: post.id,
     slug: post.slug,
     title: post.title,
     date: post.date,
@@ -107,12 +109,16 @@ function convertSupabasePost(post: SupabasePost): Post {
   }
 }
 
-export async function getAllPostsFromSupabase(): Promise<Post[]> {
-  const { data, error } = await supabaseServer
+export async function getAllPostsFromSupabase(includeUnpublished: boolean = false): Promise<Post[]> {
+  let query = supabaseServer
     .from('posts')
     .select('*')
-    .eq('published', true)
-    .order('date', { ascending: false })
+  
+  if (!includeUnpublished) {
+    query = query.eq('published', true)
+  }
+  
+  const { data, error } = await query.order('date', { ascending: false })
 
   if (error) {
     console.error('[Posts] Supabase error fetching all posts:', error)
@@ -124,7 +130,7 @@ export async function getAllPostsFromSupabase(): Promise<Post[]> {
     return []
   }
 
-  console.log(`[Posts] Fetched ${data.length} posts from Supabase`)
+  console.log(`[Posts] Fetched ${data.length} posts from Supabase${includeUnpublished ? ' (including unpublished)' : ''}`)
   return data.map(convertSupabasePost)
 }
 
@@ -160,10 +166,10 @@ export async function getLatestPostsFromSupabase(count: number = 5): Promise<Pos
 }
 
 // Unified functions that use the configured data source
-export async function getAllPostsUnified(): Promise<Post[]> {
+export async function getAllPostsUnified(includeUnpublished: boolean = false): Promise<Post[]> {
   const source = getDataSource()
   if (source === 'supabase') {
-    return getAllPostsFromSupabase()
+    return getAllPostsFromSupabase(includeUnpublished)
   }
   return getAllPosts()
 }

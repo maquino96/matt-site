@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
 }
 
+// Force dynamic rendering to ensure posts list is always fresh
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Check if editor is enabled
 function isEditorEnabled(): boolean {
   return (
@@ -21,7 +25,7 @@ function isEditorEnabled(): boolean {
 }
 
 export default async function BlogPage() {
-  const posts = await getAllPostsUnified()
+  const posts = await getAllPostsUnified(isEditorEnabled())
 
   return (
     <div className="container-content py-12">
@@ -57,7 +61,11 @@ export default async function BlogPage() {
       ) : (
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard key={post.slug} post={post} />
+            <PostCard 
+              key={post.slug} 
+              post={post} 
+              showDelete={isEditorEnabled()}
+            />
           ))}
         </div>
       )}

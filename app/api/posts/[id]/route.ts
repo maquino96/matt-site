@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { generateSlug, htmlToMarkdown } from '@/lib/tiptap/utils'
+import { extractStorageImagePaths } from '@/lib/utils/image-cleanup'
 
 // Check if editor is enabled
 function isEditorEnabled(): boolean {
@@ -96,22 +97,68 @@ export async function DELETE(
   }
 
   try {
-    const { error } = await supabaseAdmin
+    // First, fetch the post to get its content for image cleanup
+    const { data: post, error: fetchError } = await supabaseAdmin
       .from('posts')
-      .delete()
+      .select('id, content_html')
       .eq('id', params.id)
+      .single()
 
-    if (error) {
-      console.error('Supabase error:', error)
+    if (fetchError) {
+      console.error('[Delete] Error fetching post:', fetchError)
       return NextResponse.json(
-        { error: 'Failed to delete post', details: error.message },
+        { error: 'Failed to fetch post', details: fetchError.message },
         { status: 500 }
       )
     }
 
+    if (!post) {
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
+      )
+    }
+
+    // Extract and delete associated images
+    if (post.content_html) {
+      const imagePaths = extractStorageImagePaths(post.content_html)
+      
+      if (imagePaths.length > 0) {
+        console.log(`[Delete] Found ${imagePaths.length} images to delete for post ${params.id}`)
+        
+        // Delete images from storage
+        const { error: storageError } = await supabaseAdmin.storage
+          .from('blog-images')
+          .remove(imagePaths)
+
+        if (storageError) {
+          // Log error but don't fail the post deletion
+          console.error('[Delete] Error deleting images from storage:', storageError)
+          console.error('[Delete] Image paths that failed:', imagePaths)
+        } else {
+          console.log(`[Delete] Successfully deleted ${imagePaths.length} images from storage`)
+        }
+      }
+    }
+
+    // Delete the post
+    const { error: deleteError } = await supabaseAdmin
+      .from('posts')
+      .delete()
+      .eq('id', params.id)
+
+    if (deleteError) {
+      console.error('[Delete] Supabase error deleting post:', deleteError)
+      return NextResponse.json(
+        { error: 'Failed to delete post', details: deleteError.message },
+        { status: 500 }
+      )
+    }
+
+    console.log(`[Delete] Successfully deleted post ${params.id}`)
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error deleting post:', error)
+    console.error('[Delete] Error deleting post:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

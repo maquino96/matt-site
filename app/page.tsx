@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
 }
 
+// Force dynamic rendering to ensure latest posts are always fresh
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function HomePage() {
   const latestPosts = await getLatestPostsUnified(3)
 
