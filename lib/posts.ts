@@ -163,7 +163,7 @@ export async function getPostBySlugFromSupabase(slug: string): Promise<Post | nu
 export async function getLatestPostsFromSupabase(count: number = 5): Promise<Post[]> {
   // Query directly with limit for better performance and freshness
   // Sort by created_at for most recently created posts (when they were added to the database)
-  let query = supabaseServer
+  const query = supabaseServer
     .from('posts')
     .select('*')
     .eq('published', true)

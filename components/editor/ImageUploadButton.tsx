@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/core'
 import { clsx } from 'clsx'
 
 interface ImageUploadButtonProps {
@@ -45,14 +45,14 @@ export default function ImageUploadButton({ editor, buttonClass }: ImageUploadBu
             try {
               const data = JSON.parse(xhr.responseText)
               resolve(data)
-            } catch (e) {
+            } catch {
               reject(new Error('Invalid response from server'))
             }
           } else {
             try {
               const error = JSON.parse(xhr.responseText)
               reject(new Error(error.error || 'Upload failed'))
-            } catch (e) {
+            } catch {
               reject(new Error(`Upload failed with status ${xhr.status}`))
             }
           }

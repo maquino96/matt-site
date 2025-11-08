@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, KeyboardEvent } from 'react'
-import { clsx } from 'clsx'
 
 interface TagInputProps {
   tags: string[]

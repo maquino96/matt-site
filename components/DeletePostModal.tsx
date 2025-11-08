@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface DeletePostModalProps {
   isOpen: boolean
@@ -18,7 +17,6 @@ export default function DeletePostModal({
   postTitle,
   hasImages,
 }: DeletePostModalProps) {
-  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
