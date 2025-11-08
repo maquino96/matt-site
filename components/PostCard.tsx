@@ -52,11 +52,6 @@ export default function PostCard({ post, showDelete = false }: PostCardProps) {
             {formattedDate}
           </time>
         )}
-        {post.summary && (
-          <p className="text-gray-300 mb-4 line-clamp-3">
-            {post.summary}
-          </p>
-        )}
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {post.tags.map((tag) => (

@@ -22,7 +22,7 @@ export interface Post {
   title: string
   date: string
   tags: string[]
-  summary: string
+  summary?: string // Optional: deprecated, will be removed
   content: string
 }
 
@@ -33,7 +33,7 @@ interface SupabasePost {
   title: string
   date: string
   tags: string[]
-  summary: string | null
+  summary?: string | null // Optional: deprecated, will be removed
   content: string
   content_html: string | null
   published: boolean
@@ -66,7 +66,7 @@ export function getPostBySlug(slug: string): Post | null {
       title: data.title || '',
       date: data.date || '',
       tags: data.tags || [],
-      summary: data.summary || '',
+      summary: data.summary, // Optional, may be undefined
       content,
     }
   } catch (error) {
@@ -104,7 +104,7 @@ function convertSupabasePost(post: SupabasePost): Post {
     title: post.title,
     date: post.date,
     tags: post.tags || [],
-    summary: post.summary || '',
+    summary: post.summary || undefined, // Optional, convert null to undefined
     content: post.content, // Use markdown content
   }
 }

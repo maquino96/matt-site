@@ -6,19 +6,34 @@ import ImageUploadButton from './ImageUploadButton'
 
 interface ToolbarProps {
   editor: Editor
+  isDark?: boolean
 }
 
-export default function Toolbar({ editor }: ToolbarProps) {
+export default function Toolbar({ editor, isDark = true }: ToolbarProps) {
   const buttonClass = (active: boolean) =>
     clsx(
-      'px-3 py-1.5 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary-800',
-      active
-        ? 'bg-accent text-primary-900'
-        : 'bg-primary-800 text-gray-300 hover:bg-primary-700'
+      'px-3 py-1.5 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent',
+      isDark
+        ? clsx(
+            'focus:ring-offset-2 focus:ring-offset-primary-800',
+            active
+              ? 'bg-accent text-primary-900'
+              : 'bg-primary-800 text-gray-300 hover:bg-primary-700'
+          )
+        : clsx(
+            'focus:ring-offset-2 focus:ring-offset-white',
+            active
+              ? 'bg-accent text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          )
     )
 
   return (
-    <div className="flex flex-wrap items-center gap-1 p-2 bg-primary-800 border-b border-primary-700">
+    <div className={`flex flex-wrap items-center gap-1 p-2 border-b ${
+      isDark 
+        ? 'bg-primary-800 border-primary-700' 
+        : 'bg-gray-50 border-gray-200'
+    }`}>
       {/* Text Formatting */}
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}

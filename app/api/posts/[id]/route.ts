@@ -24,7 +24,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const { title, slug: providedSlug, tags, summary, content, published } = body
+    const { title, slug: providedSlug, tags, content, published } = body
 
     if (!title || !content) {
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function PUT(
 
     if (existingPost) {
       return NextResponse.json(
-        { error: 'A post with this slug already exists' },
+        { error: 'A post with this title already exists' },
         { status: 409 }
       )
     }
@@ -58,7 +58,6 @@ export async function PUT(
         slug,
         title: title.trim(),
         tags: tags || [],
-        summary: summary?.trim() || null,
         content: markdown,
         content_html: content,
         published: published || false,

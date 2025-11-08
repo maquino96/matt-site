@@ -18,12 +18,11 @@ export default function EditorPage() {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [tags, setTags] = useState<string[]>([])
-  const [summary, setSummary] = useState('')
   const [content, setContent] = useState('<p></p>')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [previewMode, setPreviewMode] = useState<'split' | 'edit' | 'preview'>('split')
+  const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit')
 
   // Redirect if editor not enabled
   useEffect(() => {
@@ -57,7 +56,6 @@ export default function EditorPage() {
           title: title.trim(),
           slug,
           tags,
-          summary: summary.trim(),
           content,
           published: publish,
         }),
@@ -107,74 +105,31 @@ export default function EditorPage() {
 
         {/* Tags */}
         <TagInput tags={tags} onChange={setTags} />
-
-        {/* Summary */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Summary
-          </label>
-          <textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="Brief summary of your post"
-            rows={3}
-            className="w-full px-4 py-2 bg-primary-900 border border-primary-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            {summary.length} characters
-          </p>
-        </div>
       </div>
 
       {/* Preview Mode Toggle */}
       <div className="flex items-center gap-2 mb-4">
         <button
-          onClick={() => setPreviewMode('edit')}
-          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-            previewMode === 'edit'
-              ? 'bg-accent text-primary-900'
-              : 'bg-primary-800 text-gray-300 hover:bg-primary-700'
-          }`}
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => setPreviewMode('split')}
-          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-            previewMode === 'split'
-              ? 'bg-accent text-primary-900'
-              : 'bg-primary-800 text-gray-300 hover:bg-primary-700'
-          }`}
-        >
-          Split
-        </button>
-        <button
-          onClick={() => setPreviewMode('preview')}
+          onClick={() => setPreviewMode(previewMode === 'preview' ? 'edit' : 'preview')}
           className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
             previewMode === 'preview'
               ? 'bg-accent text-primary-900'
               : 'bg-primary-800 text-gray-300 hover:bg-primary-700'
           }`}
         >
-          Preview
+          {previewMode === 'preview' ? 'Edit' : 'Preview'}
         </button>
       </div>
 
       {/* Editor and Preview */}
-      <div
-        className={`grid gap-4 mb-6 ${
-          previewMode === 'split'
-            ? 'lg:grid-cols-2'
-            : 'grid-cols-1'
-        }`}
-      >
-        {(previewMode === 'edit' || previewMode === 'split') && (
+      <div className="grid gap-4 mb-6 grid-cols-1">
+        {previewMode === 'edit' && (
           <div>
             <h2 className="text-lg font-semibold text-gray-200 mb-2">Editor</h2>
             <TiptapEditor content={content} onChange={setContent} />
           </div>
         )}
-        {(previewMode === 'preview' || previewMode === 'split') && (
+        {previewMode === 'preview' && (
           <div>
             <h2 className="text-lg font-semibold text-gray-200 mb-2">Preview</h2>
             <PreviewPane htmlContent={content} />

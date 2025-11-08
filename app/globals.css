@@ -46,7 +46,7 @@
     @apply bg-primary-700 text-gray-100 hover:bg-primary-600;
   }
 
-  /* Tiptap Editor Styles */
+  /* Tiptap Editor Styles - Dark Mode (default) */
   .ProseMirror {
     @apply text-gray-100;
     outline: none;
@@ -116,6 +116,40 @@
     float: left;
     height: 0;
     pointer-events: none;
+  }
+
+  /* Light Mode Editor Styles */
+  .prose-slate .ProseMirror {
+    @apply text-gray-900;
+  }
+
+  .prose-slate .ProseMirror h1,
+  .prose-slate .ProseMirror h2 {
+    @apply text-gray-900;
+  }
+
+  .prose-slate .ProseMirror h3 {
+    @apply text-gray-800;
+  }
+
+  .prose-slate .ProseMirror blockquote {
+    @apply border-gray-300 text-gray-600;
+  }
+
+  .prose-slate .ProseMirror code {
+    @apply bg-gray-100 text-gray-900;
+  }
+
+  .prose-slate .ProseMirror pre {
+    @apply bg-gray-100 border-gray-300;
+  }
+
+  .prose-slate .ProseMirror pre code {
+    @apply text-gray-900;
+  }
+
+  .prose-slate .ProseMirror p.is-editor-empty:first-child::before {
+    @apply text-gray-400;
   }
 }
 

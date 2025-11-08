@@ -43,12 +43,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
+  // Generate description from content excerpt (first 160 characters)
+  const contentExcerpt = post.content
+    .replace(/[#*`]/g, '') // Remove markdown formatting
+    .replace(/\n/g, ' ') // Replace newlines with spaces
+    .trim()
+    .substring(0, 160)
+    .trim()
+
   return {
     title: post.title,
-    description: post.summary,
+    description: contentExcerpt || post.title,
     openGraph: {
       title: post.title,
-      description: post.summary,
+      description: contentExcerpt || post.title,
       type: 'article',
       publishedTime: post.date,
       tags: post.tags,
@@ -150,7 +158,6 @@ export default async function BlogPostPage({ params }: PageProps) {
             '@type': 'BlogPosting',
             headline: post.title,
             datePublished: post.date,
-            description: post.summary,
             author: {
               '@type': 'Person',
               name: 'Matt',

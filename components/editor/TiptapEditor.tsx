@@ -1,9 +1,9 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { EditorContent, useEditor } from '@tiptap/react'
 import { extensions } from '@/lib/tiptap/extensions'
 import Toolbar from './Toolbar'
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 
 interface TiptapEditorProps {
   content: string
@@ -11,11 +11,50 @@ interface TiptapEditorProps {
   editable?: boolean
 }
 
+// Detect theme preference
+function useTheme() {
+  const [isDark, setIsDark] = useState(true) // Default to dark
+
+  useEffect(() => {
+    // Check for dark mode class on html element
+    const htmlElement = document.documentElement
+    const checkTheme = () => {
+      // Check if html has dark class or if system prefers dark
+      const hasDarkClass = htmlElement.classList.contains('dark')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setIsDark(hasDarkClass || (!htmlElement.classList.contains('light') && prefersDark))
+    }
+
+    checkTheme()
+
+    // Watch for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = () => checkTheme()
+    mediaQuery.addEventListener('change', handleChange)
+
+    // Watch for class changes on html element
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(htmlElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+      observer.disconnect()
+    }
+  }, [])
+
+  return isDark
+}
+
 export default function TiptapEditor({ 
   content, 
   onChange, 
   editable = true 
 }: TiptapEditorProps) {
+  const isDark = useTheme()
+
   const editor = useEditor({
     extensions,
     content,
@@ -25,7 +64,9 @@ export default function TiptapEditor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none focus:outline-none min-h-[400px] p-4',
+        class: `prose max-w-none focus:outline-none min-h-[400px] p-4 ${
+          isDark ? 'prose-invert' : 'prose-slate'
+        }`,
       },
     },
   })
@@ -77,22 +118,30 @@ export default function TiptapEditor({
 
   if (!editor) {
     return (
-      <div className="bg-primary-900 border border-primary-700 rounded-lg p-4 min-h-[400px] flex items-center justify-center">
-        <div className="text-gray-400">Loading editor...</div>
+      <div className={`${
+        isDark 
+          ? 'bg-primary-900 border-primary-700 text-gray-400' 
+          : 'bg-white border-gray-300 text-gray-600'
+      } border rounded-lg p-4 min-h-[400px] flex items-center justify-center`}>
+        <div>Loading editor...</div>
       </div>
     )
   }
 
   return (
     <div 
-      className="bg-primary-900 border border-primary-700 rounded-lg overflow-hidden"
+      className={`${
+        isDark 
+          ? 'bg-primary-900 border-primary-700' 
+          : 'bg-white border-gray-300'
+      } border rounded-lg overflow-hidden`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      {editable && <Toolbar editor={editor} />}
+      {editable && <Toolbar editor={editor} isDark={isDark} />}
       <EditorContent 
         editor={editor}
-        className="text-gray-100"
+        className={isDark ? 'text-gray-100' : 'text-gray-900'}
       />
     </div>
   )

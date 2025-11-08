@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { title, slug: providedSlug, tags, summary, content, published } = body
+    const { title, slug: providedSlug, tags, content, published } = body
 
     // Validate required fields
     if (!title || !content) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     if (existingPost) {
       return NextResponse.json(
-        { error: 'A post with this slug already exists' },
+        { error: 'A post with this title already exists' },
         { status: 409 }
       )
     }
@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
         slug,
         title: title.trim(),
         tags: tags || [],
-        summary: summary?.trim() || null,
         content: markdown, // Store as markdown
         content_html: content, // Also store HTML for quick rendering
         published: published || false,

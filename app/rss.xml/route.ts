@@ -16,7 +16,7 @@ export async function GET() {
       <link>${postUrl}</link>
       <guid>${postUrl}</guid>
       <pubDate>${pubDate}</pubDate>
-      <description><![CDATA[${post.summary || ''}]]></description>
+      <description><![CDATA[${post.title}]]></description>
     </item>`
     })
     .join('\n')
