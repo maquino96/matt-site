@@ -92,6 +92,7 @@ export const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
         aria-label="toolbar"
         data-variant={variant}
         className={cn("tiptap-toolbar", className)}
+        style={{ backgroundColor: 'rgba(14, 14, 17, 1)', ...props.style }}
         {...props}
       >
         {children}

@@ -275,7 +275,7 @@ export function SimpleEditor({
   }, [isMobile, mobileView])
 
   return (
-    <div className="simple-editor-container">
+    <div className="simple-editor-container" style={{ backgroundColor: 'rgba(14, 14, 17, 1)' }}>
       <EditorContext.Provider value={{ editor }}>
         {editable && (
           <Toolbar
@@ -307,6 +307,7 @@ export function SimpleEditor({
           editor={editor}
           role="presentation"
           className="simple-editor-content"
+          style={{ backgroundColor: 'rgba(14, 14, 17, 1)' }}
         />
       </EditorContext.Provider>
     </div>

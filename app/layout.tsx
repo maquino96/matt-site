@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: 'Matt Site',
   },
+  themeColor: '#0f172a', // Dark background color
 }
 
 export default function RootLayout({
@@ -28,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" style={{ backgroundColor: '#0f172a' }}>
+      <body className={inter.className} style={{ backgroundColor: '#0f172a' }}>
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

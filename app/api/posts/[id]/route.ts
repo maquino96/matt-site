@@ -2,23 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { generateSlug, htmlToMarkdown } from '@/lib/tiptap/utils'
 import { extractStorageImagePaths } from '@/lib/utils/image-cleanup'
-
-// Check if editor is enabled
-function isEditorEnabled(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_ENABLE_EDITOR === 'true' ||
-    process.env.NODE_ENV === 'development'
-  )
-}
+import { verifyAdminSession } from '@/lib/auth/admin-auth'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!isEditorEnabled()) {
+  // Check if admin is authenticated
+  const isAuthenticated = await verifyAdminSession()
+  if (!isAuthenticated) {
     return NextResponse.json(
-      { error: 'Editor is not enabled' },
-      { status: 403 }
+      { error: 'Unauthorized' },
+      { status: 401 }
     )
   }
 
@@ -88,10 +83,12 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!isEditorEnabled()) {
+  // Check if admin is authenticated
+  const isAuthenticated = await verifyAdminSession()
+  if (!isAuthenticated) {
     return NextResponse.json(
-      { error: 'Editor is not enabled' },
-      { status: 403 }
+      { error: 'Unauthorized' },
+      { status: 401 }
     )
   }
 

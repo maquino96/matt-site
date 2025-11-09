@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { generateSlug, htmlToMarkdown } from '@/lib/tiptap/utils'
-
-// Check if editor is enabled
-function isEditorEnabled(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_ENABLE_EDITOR === 'true' ||
-    process.env.NODE_ENV === 'development'
-  )
-}
+import { verifyAdminSession } from '@/lib/auth/admin-auth'
 
 export async function POST(request: NextRequest) {
-  // Check if editor is enabled
-  if (!isEditorEnabled()) {
+  // Check if admin is authenticated
+  const isAuthenticated = await verifyAdminSession()
+  if (!isAuthenticated) {
     return NextResponse.json(
-      { error: 'Editor is not enabled' },
-      { status: 403 }
+      { error: 'Unauthorized' },
+      { status: 401 }
     )
   }
 

@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-
-// Check if editor is enabled
-function isEditorEnabled(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_ENABLE_EDITOR === 'true' ||
-    process.env.NODE_ENV === 'development'
-  )
-}
+import { verifyAdminSession } from '@/lib/auth/admin-auth'
 
 // Maximum file size: 5MB
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -17,10 +10,12 @@ const MAX_IMAGE_WIDTH = 1200
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
 
 export async function POST(request: NextRequest) {
-  if (!isEditorEnabled()) {
+  // Check if admin is authenticated
+  const isAuthenticated = await verifyAdminSession()
+  if (!isAuthenticated) {
     return NextResponse.json(
-      { error: 'Editor is not enabled' },
-      { status: 403 }
+      { error: 'Unauthorized' },
+      { status: 401 }
     )
   }
 

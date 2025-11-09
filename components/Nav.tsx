@@ -15,7 +15,7 @@ export default function Nav() {
   const pathname = usePathname()
 
   return (
-    <nav className="bg-primary-800 border-b border-primary-700" role="navigation" aria-label="Main navigation">
+    <nav className="bg-primary-800 border-b border-primary-700" style={{ backgroundColor: '#08263C' }} role="navigation" aria-label="Main navigation">
       <div className="container-content">
         <div className="flex items-center justify-between h-16">
           <Link 
