@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.scss'
-import Nav from '@/components/Nav'
-import Footer from '@/components/Footer'
-import DataSourceIndicator from '@/components/DataSourceIndicator'
+import LayoutFrame from '@/components/LayoutFrame'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,12 +32,9 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <Nav />
-        <main id="main-content" className="min-h-screen">
+        <LayoutFrame>
           {children}
-        </main>
-        <Footer />
-        <DataSourceIndicator />
+        </LayoutFrame>
       </body>
     </html>
   )

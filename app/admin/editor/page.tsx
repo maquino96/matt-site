@@ -13,5 +13,9 @@ export default async function EditorPage() {
     )
   }
 
-  return <EditorClient />
+  return (
+    <div className="h-screen overflow-hidden">
+      <EditorClient />
+    </div>
+  )
 }

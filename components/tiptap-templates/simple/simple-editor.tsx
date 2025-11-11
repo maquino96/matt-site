@@ -14,6 +14,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
+import { Placeholder } from "@tiptap/extension-placeholder"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -188,12 +189,16 @@ interface SimpleEditorProps {
   content?: string
   onChange?: (content: string) => void
   editable?: boolean
+  borderless?: boolean
+  fullHeight?: boolean
 }
 
 export function SimpleEditor({ 
   content: initialContent, 
   onChange,
-  editable = true 
+  editable = true,
+  borderless = false,
+  fullHeight = false
 }: SimpleEditorProps = {}) {
   const isMobile = useIsMobile()
   const { height } = useWindowSize()
@@ -232,6 +237,14 @@ export function SimpleEditor({
       Superscript,
       Subscript,
       Underline,
+      Placeholder.configure({
+        placeholder: ({ node }) => {
+          if (node.type.name === "heading" && node.attrs.level === 1) {
+            return "Required: Post Title"
+          }
+          return "Start typing..."
+        },
+      }),
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
@@ -275,7 +288,14 @@ export function SimpleEditor({
   }, [isMobile, mobileView])
 
   return (
-    <div className="simple-editor-container" style={{ backgroundColor: 'rgba(14, 14, 17, 1)' }}>
+    <div 
+      className="simple-editor-container" 
+      style={{ 
+        backgroundColor: 'rgba(14, 14, 17, 1)',
+        ...(borderless ? { border: 'none', borderRadius: 0 } : {}),
+        ...(fullHeight ? { height: '100%' } : {})
+      }}
+    >
       <EditorContext.Provider value={{ editor }}>
         {editable && (
           <Toolbar
@@ -307,7 +327,6 @@ export function SimpleEditor({
           editor={editor}
           role="presentation"
           className="simple-editor-content"
-          style={{ backgroundColor: 'rgba(14, 14, 17, 1)' }}
         />
       </EditorContext.Provider>
     </div>
