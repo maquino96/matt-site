@@ -15,6 +15,7 @@ import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
 import { Placeholder } from "@tiptap/extension-placeholder"
+import { TitleEnforcer } from "@/components/tiptap-extensions/title-enforcer"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -252,6 +253,7 @@ export function SimpleEditor({
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
+      TitleEnforcer,
     ],
     content: initialContent || content,
     editable,

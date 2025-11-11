@@ -54,6 +54,13 @@ body,
   font-family: "DM Sans", sans-serif;
 }
 
+/* Remove border from focused editor - more specific selector */
+.simple-editor-content .tiptap.ProseMirror.ProseMirror-focused {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .simple-editor-container {
   display: flex;
   flex-direction: column;
@@ -79,7 +86,10 @@ body,
 
 .simple-editor-content .tiptap.ProseMirror.simple-editor {
   flex: 1;
-  padding: 1.5rem;
+  padding: 3.5rem;
+  width: 70%; /* Reduce width to 85% */
+  margin: 0 auto; /* Center the content */
+  border: none; 
 }
 
 @media screen and (max-width: 480px) {
