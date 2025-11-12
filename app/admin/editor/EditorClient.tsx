@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import TiptapEditor from '@/components/editor/TiptapEditor'
 import { generateSlug } from '@/lib/tiptap/utils'
@@ -18,45 +18,7 @@ export default function EditorClient() {
     setIsLoaded(true)
   }, [])
 
-  // Keyboard shortcuts: Cmd/Ctrl+S = Save draft, Cmd/Ctrl+Enter = Publish
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      const meta = e.metaKey || e.ctrlKey
-      if (meta && e.key.toLowerCase() === 's') {
-        e.preventDefault()
-        if (!isSaving) handleSave(false)
-      }
-      if (meta && e.key === 'Enter') {
-        e.preventDefault()
-        if (!isSaving) handleSave(true)
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [isSaving, content])
-
-  const extractTitleFromContent = (html: string): string => {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(html, 'text/html')
-    const firstH1 = doc.querySelector('h1')
-    return firstH1?.textContent?.trim() || ''
-  }
-
-  const cleanEditorContent = (html: string): string => {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(html, 'text/html')
-    
-    // Remove the first H1 element
-    const firstH1 = doc.querySelector('h1')
-    if (firstH1) {
-      firstH1.remove()
-    }
-    
-    // Return the cleaned HTML
-    return doc.body.innerHTML.trim() || '<p></p>'
-  }
-
-  const handleSave = async (publish: boolean = false) => {
+  const handleSave = useCallback(async (publish: boolean = false) => {
     const title = extractTitleFromContent(content)
     if (!title.trim()) {
       setError('Title is required')
@@ -96,31 +58,71 @@ export default function EditorClient() {
       setError(err instanceof Error ? err.message : 'An error occurred')
       setIsSaving(false)
     }
+  }, [content, tags, router])
+
+  // Keyboard shortcuts: Cmd/Ctrl+S = Save draft, Cmd/Ctrl+Enter = Publish
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const meta = e.metaKey || e.ctrlKey
+      if (meta && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+        if (!isSaving) handleSave(false)
+      }
+      if (meta && e.key === 'Enter') {
+        e.preventDefault()
+        if (!isSaving) handleSave(true)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isSaving, handleSave])
+
+  const extractTitleFromContent = (html: string): string => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+    const firstH1 = doc.querySelector('h1')
+    return firstH1?.textContent?.trim() || ''
+  }
+
+  const cleanEditorContent = (html: string): string => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+    
+    // Remove the first H1 element
+    const firstH1 = doc.querySelector('h1')
+    if (firstH1) {
+      firstH1.remove()
+    }
+    
+    // Return the cleaned HTML
+    return doc.body.innerHTML.trim() || '<p></p>'
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className={`flex-1 w-full flex flex-col transition-opacity duration-600 ease-out transition-transform duration-1000 ease-out ${
-        isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-      }`}>
-        <TiptapEditor
-          tags={tags}
-          onTagsChange={setTags}
-          content={content}
-          onChange={setContent}
-          editable={!isSaving}
-        />
-      </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="w-full px-4 mb-4">
-          <div className="p-4 bg-red-900/20 border border-red-700 rounded-md text-red-400">
-            {error}
-          </div>
+    <>
+      <div className="w-full h-full flex flex-col">
+        <div className={`flex-1 w-full flex flex-col transition-opacity duration-600 ease-out transition-transform duration-1000 ease-out ${
+          isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`}>
+          <TiptapEditor
+            tags={tags}
+            onTagsChange={setTags}
+            content={content}
+            onChange={setContent}
+            editable={!isSaving}
+          />
         </div>
-      )}
-    </div>
+
+        {/* Messages */}
+        {error && (
+          <div className="w-full px-4 mb-4">
+            <div className="p-4 bg-red-900/20 border border-red-700 rounded-md text-red-400">
+              {error}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 

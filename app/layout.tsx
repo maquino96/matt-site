@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.scss'
 import LayoutFrame from '@/components/LayoutFrame'
+import { Provider } from '@/components/ui/provider'
+import React from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,11 +32,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" style={{ backgroundColor: '#0f172a' }}>
-      <body className={inter.className} style={{ backgroundColor: '#0f172a' }}>
-        <LayoutFrame>
-          {children}
-        </LayoutFrame>
+    <html lang="en">
+      <body className={inter.className}>
+        <Provider>
+          <LayoutFrame>
+            {children}
+          </LayoutFrame>
+        </Provider>
       </body>
     </html>
   )
