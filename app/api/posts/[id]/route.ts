@@ -4,6 +4,51 @@ import { generateSlug, htmlToMarkdown } from '@/lib/tiptap/utils'
 import { extractStorageImagePaths } from '@/lib/utils/image-cleanup'
 import { verifyAdminSession } from '@/lib/auth/admin-auth'
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  // Check if admin is authenticated
+  const isAuthenticated = await verifyAdminSession()
+  if (!isAuthenticated) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('posts')
+      .select('*')
+      .eq('id', params.id)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return NextResponse.json(
+          { error: 'Post not found' },
+          { status: 404 }
+        )
+      }
+      console.error('Supabase error:', error)
+      return NextResponse.json(
+        { error: 'Failed to fetch post', details: error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Error fetching post:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

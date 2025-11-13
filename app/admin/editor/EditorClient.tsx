@@ -5,13 +5,32 @@ import { useRouter } from 'next/navigation'
 import TiptapEditor from '@/components/editor/TiptapEditor'
 import { generateSlug } from '@/lib/tiptap/utils'
 
-export default function EditorClient() {
+export interface EditorClientProps {
+  content: string
+  onChange: (content: string) => void
+  isSaving?: boolean
+  onSavingChange?: (isSaving: boolean) => void
+  onDraftSaved?: () => void
+  editable?: boolean
+}
+
+export default function EditorClient({
+  content,
+  onChange,
+  isSaving: externalIsSaving,
+  onSavingChange,
+  onDraftSaved,
+  editable = true
+}: EditorClientProps) {
   const router = useRouter()
   const [tags, setTags] = useState<string[]>([])
-  const [content, setContent] = useState('<h1 style="text-align: center;"></h1><p></p>')
-  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  
+  // Use external saving state if provided, otherwise manage internally
+  const [internalIsSaving, setInternalIsSaving] = useState(false)
+  const isSaving = externalIsSaving !== undefined ? externalIsSaving : internalIsSaving
+  const setIsSaving = onSavingChange || setInternalIsSaving
 
   // Animation on mount
   useEffect(() => {
@@ -52,13 +71,19 @@ export default function EditorClient() {
 
       const post = await response.json()
       
-      // Redirect immediately to the new post without delay
-      router.push(`/blog/${post.slug}`)
+      if (publish) {
+        // Redirect immediately to the new post without delay
+        router.push(`/blog/${post.slug}`)
+      } else {
+        // For drafts, stay on page and notify parent
+        setIsSaving(false)
+        onDraftSaved?.()
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       setIsSaving(false)
     }
-  }, [content, tags, router])
+  }, [content, tags, router, setIsSaving, onDraftSaved])
 
   // Keyboard shortcuts: Cmd/Ctrl+S = Save draft, Cmd/Ctrl+Enter = Publish
   useEffect(() => {
@@ -108,8 +133,8 @@ export default function EditorClient() {
             tags={tags}
             onTagsChange={setTags}
             content={content}
-            onChange={setContent}
-            editable={!isSaving}
+            onChange={onChange}
+            editable={editable}
           />
         </div>
 

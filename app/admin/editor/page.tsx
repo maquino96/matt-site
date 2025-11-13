@@ -1,8 +1,5 @@
 import { verifyAdminSession } from '@/lib/auth/admin-auth'
-import AdminPasswordModal from '@/components/AdminPasswordModal'
-import EditorClient from './EditorClient'
-import { Provider } from '@/components/ui/provider'
-import ThinSideNav from '@/components/nav/ThinSideNav'
+import EditorWorkspaceClient from './EditorWorkspaceClient'
 
 export default async function EditorPage() {
   const isAuthenticated = await verifyAdminSession()
@@ -10,20 +7,14 @@ export default async function EditorPage() {
   if (!isAuthenticated) {
     return (
       <div>
-        <AdminPasswordModal />
+        <p>Admin access is required. Please navigate to the admin login page.</p>
       </div>
     )
   }
 
   return (
     <>
-      <Provider>
-        <ThinSideNav />
-        {/* Other themed chrome goes here */}
-      </Provider>
-
-      {/* Completely unthemed editor */}
-      <EditorClient />
+      <EditorWorkspaceClient />
     </>
   )
 }

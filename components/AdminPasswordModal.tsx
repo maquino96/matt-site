@@ -2,7 +2,12 @@
 
 import { useState, FormEvent } from 'react'
 
-export default function AdminPasswordModal() {
+interface AdminPasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AdminPasswordModal({ isOpen, onClose }: AdminPasswordModalProps) {
   const [password, setPassword] = useState('')
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,9 +46,13 @@ export default function AdminPasswordModal() {
     }
   }
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-      <div className="bg-primary-800 border border-primary-700 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" style={{ backgroundColor: '#08263C' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={onClose}>
+      <div className="bg-primary-800 border border-primary-700 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" style={{ backgroundColor: '#08263C' }} onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-bold text-gray-200 mb-4">Admin Access Required</h2>
         
         <p className="text-gray-300 mb-6">
